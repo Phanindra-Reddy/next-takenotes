@@ -39,11 +39,19 @@ import { addActiveNoteId } from "../redux/actions/activeNoteIdAction";
 
 const ITEM_HEIGHT = 48;
 
+const navOptions = [
+  { id: 1, name: "Scratchpad", icon: <BorderColorIcon /> },
+  { id: 2, name: "Notes", icon: <BookIcon /> },
+  { id: 3, name: "Favorite", icon: <StarBorderIcon /> },
+  { id: 4, name: "Trash", icon: <DeleteIcon /> },
+];
+
 const AppSidebar = () => {
   const notes = useSelector((state) => state.notes);
   const categories = useSelector((state) => state.categories);
   const dispatch = useDispatch();
 
+  const [navOptionActive, setNavOptionActive] = useState("Notes");
   const [noteCategories, setNoteCategories] = useState(null);
   const [openCategories, setCategories] = useState(true);
   const [showMoreIcon, setShowMoreIcon] = useState(null);
@@ -52,6 +60,7 @@ const AppSidebar = () => {
   const [editCategoryInput, setEditCategoryInput] = useState("");
   const [categoryInputValue, setCategoryInputValue] = useState("");
   const [activeCategoryMoreBtnId, setActiveCategoryMoreBtnId] = useState("");
+  const [categoryRenameMsg, setCategoryRenameMsg] = useState("");
   const categoryInputValueRef = useRef(null);
 
   useEffect(() => {
@@ -112,6 +121,28 @@ const AppSidebar = () => {
         </List>
         <nav aria-label="main mailbox folders">
           <List>
+            {/* {navOptions?.map((option) => (
+              <ListItem
+                disablePadding
+                key={option?.id}
+                sx={{
+                  background: `${
+                    option?.name === navOptionActive ? "#7e767665" : ""
+                  }`,
+                }}
+                onClick={() => setNavOptionActive(option?.name)}
+              >
+                <ListItemButton>
+                  <ListItemIcon sx={{ color: "white" }}>
+                    {option?.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{ color: "white" }}
+                    primary={option?.name}
+                  />
+                </ListItemButton>
+              </ListItem>
+            ))} */}
             <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon sx={{ color: "white" }}>
@@ -160,7 +191,7 @@ const AppSidebar = () => {
               secondaryAction={
                 <IconButton
                   edge="end"
-                  aria-label="comments"
+                  aria-label="categories"
                   onClick={handleCategoryInput}
                 >
                   <AddIcon sx={{ color: "white" }} />
@@ -292,11 +323,25 @@ const AppSidebar = () => {
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
-                          if (!editCategoryInput) return;
-                          dispatch(
-                            renameCategory(category?.id, editCategoryInput)
+                          const existedCategory = categories?.find(
+                            (category) =>
+                              category?.category_name.toLowerCase() ===
+                              editCategoryInput.toLowerCase()
                           );
-                          setEditCategoryId("");
+                          if (!editCategoryInput) {
+                            return;
+                          } else if (existedCategory !== undefined) {
+                            setCategoryRenameMsg(
+                              `"${editCategoryInput}" category already exists!!`
+                            );
+                            return;
+                          } else {
+                            dispatch(
+                              renameCategory(category?.id, editCategoryInput)
+                            );
+                            setEditCategoryId("");
+                            setCategoryRenameMsg("");
+                          }
                         }}
                       >
                         <input
@@ -306,6 +351,9 @@ const AppSidebar = () => {
                           onChange={(e) => setEditCategoryInput(e.target.value)}
                           className="categoryInputBox"
                         />
+                        <Typography variant="body2" sx={{ color: "#f50909" }}>
+                          {categoryRenameMsg}
+                        </Typography>
                       </form>
                     ) : (
                       <ListItemText primary={category?.category_name} />
@@ -321,10 +369,24 @@ const AppSidebar = () => {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                if (!categoryInputValue) return;
-                dispatch(addCategory(categoryInputValue));
-                setCategoryInputValue("");
-                handleCategoryInput();
+                const category = categories?.find(
+                  (category) =>
+                    category?.category_name.toLowerCase() ===
+                    categoryInputValue.toLowerCase()
+                );
+                if (!categoryInputValue) {
+                  return;
+                } else if (category !== undefined) {
+                  setCategoryRenameMsg(
+                    `"${categoryInputValue}" category already exists!!`
+                  );
+                  return;
+                } else {
+                  dispatch(addCategory(categoryInputValue));
+                  setCategoryInputValue("");
+                  setCategoryRenameMsg("");
+                  handleCategoryInput();
+                }
               }}
             >
               <input
@@ -335,6 +397,9 @@ const AppSidebar = () => {
                 onChange={(e) => setCategoryInputValue(e.target.value)}
                 className="categoryInputBox"
               />
+              <Typography variant="body2" sx={{ color: "#f50909" }}>
+                {categoryRenameMsg}
+              </Typography>
             </form>
           </Box>
         )}
