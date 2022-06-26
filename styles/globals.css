@@ -15,6 +15,18 @@ a {
   box-sizing: border-box;
 }
 
+::-webkit-scrollbar{
+  width: 1px;
+}
+
+::-webkit-scrollbar-track{
+  background-color: #dddddd;
+}
+
+::-webkit-scrollbar-thumb{
+  background-color: #3C70EB;
+}
+
 a {
   color: blue;
   font-weight: 500;
@@ -69,6 +81,19 @@ ul li {
   outline: none;
 }
 
+.searchInput{
+  width: 100%;
+  padding: 0.5rem;
+  border: 0.1em solid #3b4753e7;
+  font-size: 1rem;
+  border-radius: 3px;
+}
+
+.searchInput:focus{
+  outline: none;
+  border:2px solid  rgb(45, 45, 218);
+}
+
 .Resizer {
   background: rgba(0, 0, 0, 0.945);
   opacity: 0.2;
@@ -107,8 +132,8 @@ ul li {
 
 
 .cm-s-darcula.CodeMirror {
-  /* height: 100% !important; */
-  height: 100vh !important;
+  height: 100% !important;
+  /* height: 100vh !important; */
   line-height: 1.5;
 }
 

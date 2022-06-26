@@ -39,6 +39,7 @@ const NoteEditor = () => {
   const notes = useSelector((state) => state.notes);
   const activeNoteId = useSelector((state) => state.activeNoteId);
 
+  const [currentNote, setCurrentNote] = useState("");
   const [currentNoteFavorite, setCurrentNoteFavorite] = useState(null);
   const [currentNoteTrash, setCurrentNoteTrash] = useState(null);
 
@@ -51,6 +52,7 @@ const NoteEditor = () => {
     let noteTrash = active_note?.trash;
     setCurrentNoteFavorite(noteFavorite);
     setCurrentNoteTrash(noteTrash);
+    setCurrentNote(active_note?.text);
   }, [activeNoteId, notes]);
 
   const handleShowPreview = () => {
@@ -60,6 +62,23 @@ const NoteEditor = () => {
   const getNoteTitle = (text) => {
     let noteText = text.trim().match(/[^#]{1,45}/);
     return noteText && noteText[0].trim().split(/\r?\n/)[0];
+  };
+
+  const downloadNote = () => {
+    const pom = document.createElement("a");
+    pom.setAttribute(
+      "href",
+      `data:text/plain;charset=utf-8,${encodeURIComponent(currentNote)}`
+    );
+    pom.setAttribute("download", `${getNoteTitle(currentNote)}.md`);
+
+    if (document.createEvent) {
+      const event = document.createEvent("MouseEvents");
+      event.initEvent("click", true, true);
+      pom.dispatchEvent(event);
+    } else {
+      pom.click();
+    }
   };
 
   return (
@@ -130,7 +149,7 @@ const NoteEditor = () => {
             </ListItemButton>
           </ListItem>
 
-          <ListItem disablePadding>
+          <ListItem disablePadding onClick={downloadNote}>
             <ListItemButton
               sx={{
                 display: "flex",

@@ -39,15 +39,19 @@ import { addActiveNoteId } from "../redux/actions/activeNoteIdAction";
 
 const ITEM_HEIGHT = 48;
 
-
-
-const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
+const AppSidebar = ({
+  navOptions,
+  navOptionActive,
+  setNavOptionActive,
+  noteCategories,
+  currentCategory,
+  setCurrentCategory,
+}) => {
   const notes = useSelector((state) => state.notes);
   const categories = useSelector((state) => state.categories);
   const dispatch = useDispatch();
 
-  
-  const [noteCategories, setNoteCategories] = useState(null);
+  //const [noteCategories, setNoteCategories] = useState(null);
   const [openCategories, setCategories] = useState(true);
   const [showMoreIcon, setShowMoreIcon] = useState(null);
   const [categoryInput, setCategoryInput] = useState(false);
@@ -58,9 +62,9 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
   const [categoryRenameMsg, setCategoryRenameMsg] = useState("");
   const categoryInputValueRef = useRef(null);
 
-  useEffect(() => {
-    setNoteCategories(categories);
-  }, [categories]);
+  // useEffect(() => {
+  //   setNoteCategories(categories);
+  // }, [categories]);
 
   useEffect(() => {
     if (categoryInput) {
@@ -105,6 +109,11 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
               );
               dispatch(addActiveNoteId(notes && notes[0]?.id));
             }}
+            sx={{
+              "&:hover": {
+                background: "#3C70EB",
+              },
+            }}
           >
             <ListItemButton>
               <ListItemIcon sx={{ color: "white" }}>
@@ -116,8 +125,6 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
         </List>
         <nav aria-label="main mailbox folders">
           <List>
-
-
             {navOptions?.map((option) => (
               <ListItem
                 disablePadding
@@ -127,7 +134,10 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
                     option?.name === navOptionActive ? "#7e767665" : ""
                   }`,
                 }}
-                onClick={() => setNavOptionActive(option?.name)}
+                onClick={() => {
+                  setCurrentCategory("");
+                  setNavOptionActive(option?.name);
+                }}
               >
                 <ListItemButton>
                   <ListItemIcon sx={{ color: "white" }}>
@@ -140,7 +150,6 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
                 </ListItemButton>
               </ListItem>
             ))}
-
 
             {/* <ListItem disablePadding>
               <ListItemButton>
@@ -174,8 +183,6 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
                 <ListItemText sx={{ color: "white" }} primary="Trash" />
               </ListItemButton>
             </ListItem> */}
-
-
           </List>
         </nav>
         <Divider />
@@ -224,6 +231,10 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
               return (
                 <ListItem
                   key={category?.id}
+                  onClick={() => {
+                    setNavOptionActive("");
+                    setCurrentCategory(category?.id);
+                  }}
                   secondaryAction={
                     <>
                       <IconButton
@@ -300,8 +311,15 @@ const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
                     justifyContent: "space-between",
                     color: "white",
                     background: `${
-                      activeCategoryMoreBtnId === category?.id ? "#3c70eb" : ""
+                      currentCategory === category?.id
+                        ? "#7e767665"
+                        : ""
                     }`,
+                    // background: `${
+                    //   activeCategoryMoreBtnId === category?.id
+                    //     ? "#7e767665"
+                    //     : ""
+                    // }`,
                     // color: `${activeNoteId === note?.id ? "white" : "black"}`,
                   }}
                 >

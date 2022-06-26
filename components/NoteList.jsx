@@ -30,12 +30,12 @@ import {
   addToTrash,
   addCategoryToNote,
   deleteNote,
-  emptyTrash
+  emptyTrash,
 } from "../redux/actions/notesListActions";
 
 const ITEM_HEIGHT = 48;
 
-const NoteList = ({ navOptionActive }) => {
+const NoteList = ({ navOptionActive, currentCategory }) => {
   const dispatch = useDispatch();
   const notes = useSelector((state) => state.notes);
   const categories = useSelector((state) => state.categories);
@@ -44,6 +44,7 @@ const NoteList = ({ navOptionActive }) => {
   const [activeNoteId, setActiveNoteId] = useState(currentNoteId);
   const [showMoreIcon, setShowMoreIcon] = useState(null);
   const [noteMoreIconId, setNoteMoreIconId] = useState("");
+  const [notesSearchText, setNotesSearchText] = useState("");
 
   useEffect(() => {
     if (navOptionActive === "Notes") {
@@ -51,11 +52,17 @@ const NoteList = ({ navOptionActive }) => {
     } else if (navOptionActive === "Favorite") {
       let favoritesNotes = notes?.filter((note) => note?.favorite === true);
       setNotesList(favoritesNotes);
-    } else {
+    } else if(navOptionActive === "Trash") {
       let trashNotes = notes?.filter((note) => note?.trash === true);
       setNotesList(trashNotes);
+    } else {
+      let filteredCategoryNotesList = notes?.filter(
+        (note) => note?.category === currentCategory
+      );
+      setNotesList(filteredCategoryNotesList)
     }
-  }, [notes, navOptionActive]);
+  }, [notes, navOptionActive, currentCategory]);
+
 
   const openCategoryMoreBtn = Boolean(showMoreIcon);
 
@@ -66,10 +73,6 @@ const NoteList = ({ navOptionActive }) => {
 
   const closeCategoryMoreBtn = () => {
     setShowMoreIcon(null);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
   };
 
   const getNoteTitle = (text) => {
@@ -87,28 +90,36 @@ const NoteList = ({ navOptionActive }) => {
     closeCategoryMoreBtn();
   };
 
+  const handleNoteSearch = (event) => {
+    event.preventDefault();
+  };
+
   return (
     <Box sx={{ background: "#E5E5E5", height: "100%" }}>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{ display: "flex", itemsCenter: "center", padding: "8px" }}
-      >
-        <TextField
-          fullWidth
-          size="small"
-          id="search"
-          label="Search for notes"
-          name="search"
-          autoComplete="search"
-          autoFocus
-        />
-        {/* <Button variant="contained" color="error" sx={{ml:1}}>Empty</Button> */}
-        {navOptionActive === "Trash" && (
-          <Button variant="contained" color="error" sx={{ ml: 1 }} onClick={()=>dispatch(emptyTrash())}>
-            Empty
-          </Button>
-        )}
+      <Box>
+        <form
+          style={{ padding: "8px", display: "flex" }}
+          onKeyUp={handleNoteSearch}
+        >
+          <input
+            type="text"
+            placeholder="Searh for notes"
+            value={notesSearchText}
+            onChange={(e) => setNotesSearchText(e.target.value)}
+            className="searchInput"
+          />
+
+          {navOptionActive === "Trash" && (
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ ml: 1 }}
+              onClick={() => dispatch(emptyTrash())}
+            >
+              Empty
+            </Button>
+          )}
+        </form>
       </Box>
 
       <Divider />
@@ -201,10 +212,10 @@ const NoteList = ({ navOptionActive }) => {
                               closeCategoryMoreBtn();
                             }}
                             sx={{
-                              "&:hover":{
-                                background:"red",
-                                color:"white"
-                              }
+                              "&:hover": {
+                                background: "red",
+                                color: "white",
+                              },
                             }}
                           >
                             <CloseIcon sx={{ mr: 2 }} />

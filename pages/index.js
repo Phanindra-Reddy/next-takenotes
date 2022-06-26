@@ -26,10 +26,18 @@ export default function Home() {
 
   const [currentNoteId, setCurrentNoteId] = useState("");
   const [navOptionActive, setNavOptionActive] = useState("Notes");
+  const [noteCategories, setNoteCategories] = useState(null);
+  const [currentCategory, setCurrentCategory] = useState("");
 
   useEffect(() => {
     setCurrentNoteId(activeNoteId);
   }, [activeNoteId]);
+
+  useEffect(() => {
+    setNoteCategories(categories);
+  }, [categories]);
+
+  console.log(currentCategory)
 
   return (
     <>
@@ -50,6 +58,9 @@ export default function Home() {
             navOptions={navOptions}
             navOptionActive={navOptionActive}
             setNavOptionActive={setNavOptionActive}
+            noteCategories={noteCategories}
+            currentCategory={currentCategory}
+            setCurrentCategory={setCurrentCategory}
           />
           <SplitPane
             split="vertical"
@@ -58,7 +69,10 @@ export default function Home() {
             defaultSize={300}
           >
             {navOptionActive !== "Scratchpad" && (
-              <NoteList navOptionActive={navOptionActive} />
+              <NoteList
+                navOptionActive={navOptionActive}
+                currentCategory={currentCategory}
+              />
             )}
             <NoteEditor />
           </SplitPane>
