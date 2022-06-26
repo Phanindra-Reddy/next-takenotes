@@ -1,4 +1,4 @@
-import React,{useState, useEffect} from 'react';
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import SplitPane from "react-split-pane";
 
@@ -7,19 +7,29 @@ import NoteList from "../components/NoteList";
 import NoteEditor from "../components/NoteEditor";
 import { useSelector } from "react-redux";
 
+import BorderColorIcon from "@mui/icons-material/BorderColor";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import BookIcon from "@mui/icons-material/Book";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-
+const navOptions = [
+  { id: 1, name: "Scratchpad", icon: <BorderColorIcon /> },
+  { id: 2, name: "Notes", icon: <BookIcon /> },
+  { id: 3, name: "Favorite", icon: <StarBorderIcon /> },
+  { id: 4, name: "Trash", icon: <DeleteIcon /> },
+];
 
 export default function Home() {
-  const categories = useSelector(state => state.categories)
-  const notes = useSelector(state => state.notes)
-  const activeNoteId = useSelector(state=>state.activeNoteId)
+  const categories = useSelector((state) => state.categories);
+  const notes = useSelector((state) => state.notes);
+  const activeNoteId = useSelector((state) => state.activeNoteId);
 
-  const [currentNoteId, setCurrentNoteId] = useState()
+  const [currentNoteId, setCurrentNoteId] = useState("");
+  const [navOptionActive, setNavOptionActive] = useState("Notes");
 
-  useEffect(()=>{
-    setCurrentNoteId(activeNoteId)
-  },[activeNoteId])
+  useEffect(() => {
+    setCurrentNoteId(activeNoteId);
+  }, [activeNoteId]);
 
   return (
     <>
@@ -36,14 +46,20 @@ export default function Home() {
           maxSize={500}
           defaultSize={240}
         >
-          <AppSidebar />
+          <AppSidebar
+            navOptions={navOptions}
+            navOptionActive={navOptionActive}
+            setNavOptionActive={setNavOptionActive}
+          />
           <SplitPane
             split="vertical"
             minSize={150}
             maxSize={500}
             defaultSize={300}
           >
-            <NoteList />
+            {navOptionActive !== "Scratchpad" && (
+              <NoteList navOptionActive={navOptionActive} />
+            )}
             <NoteEditor />
           </SplitPane>
         </SplitPane>

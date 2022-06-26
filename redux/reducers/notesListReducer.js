@@ -5,7 +5,7 @@ import { initialText } from "../../utils/initialNotes";
 const notesList = [
   {
     id: "mpr-4070-222",
-    category: "react",
+    category: "Notes",
     created: "2022-06-21T17:22:55+05:30",
     favorite: false,
     lastUpdated: "2022-06-21T17:22:55+05:30",
@@ -54,6 +54,9 @@ const notesListReducer = (state = notesList, action) => {
 
     case NOTE_ACTIONS.DELETE_NOTE:
       return state.filter((note) => note.id !== action.id);
+
+    case NOTE_ACTIONS.EMPTY_TRASH:
+      return state.filter((note) => !note?.trash)
 
     default:
       return state;

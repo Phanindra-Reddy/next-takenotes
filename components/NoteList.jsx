@@ -17,6 +17,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import DeleteIcon from "@mui/icons-material/Delete";
+import CloseIcon from "@mui/icons-material/Close";
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";
@@ -28,11 +29,13 @@ import {
   addToFavourite,
   addToTrash,
   addCategoryToNote,
+  deleteNote,
+  emptyTrash
 } from "../redux/actions/notesListActions";
 
 const ITEM_HEIGHT = 48;
 
-const NoteList = ({ showTrashBtn }) => {
+const NoteList = ({ navOptionActive }) => {
   const dispatch = useDispatch();
   const notes = useSelector((state) => state.notes);
   const categories = useSelector((state) => state.categories);
@@ -43,8 +46,16 @@ const NoteList = ({ showTrashBtn }) => {
   const [noteMoreIconId, setNoteMoreIconId] = useState("");
 
   useEffect(() => {
-    setNotesList(notes);
-  }, [notes]);
+    if (navOptionActive === "Notes") {
+      setNotesList(notes);
+    } else if (navOptionActive === "Favorite") {
+      let favoritesNotes = notes?.filter((note) => note?.favorite === true);
+      setNotesList(favoritesNotes);
+    } else {
+      let trashNotes = notes?.filter((note) => note?.trash === true);
+      setNotesList(trashNotes);
+    }
+  }, [notes, navOptionActive]);
 
   const openCategoryMoreBtn = Boolean(showMoreIcon);
 
@@ -66,7 +77,12 @@ const NoteList = ({ showTrashBtn }) => {
     return noteText && noteText[0].trim().split(/\r?\n/)[0];
   };
 
-  const handleCategoryChangeForNot = (id, value) => {
+  const getNoteCategory = (id) => {
+    let noteCategory = categories.find((category) => category?.id === id);
+    return noteCategory?.category_name;
+  };
+
+  const handleCategoryChangeForNote = (id, value) => {
     dispatch(addCategoryToNote(id, value));
     closeCategoryMoreBtn();
   };
@@ -88,7 +104,11 @@ const NoteList = ({ showTrashBtn }) => {
           autoFocus
         />
         {/* <Button variant="contained" color="error" sx={{ml:1}}>Empty</Button> */}
-        {/* {showTrashBtn && <Button variant="contained" color="error" sx={{ml:1}} >Empty</Button>} */}
+        {navOptionActive === "Trash" && (
+          <Button variant="contained" color="error" sx={{ ml: 1 }} onClick={()=>dispatch(emptyTrash())}>
+            Empty
+          </Button>
+        )}
       </Box>
 
       <Divider />
@@ -138,66 +158,101 @@ const NoteList = ({ showTrashBtn }) => {
                           },
                         }}
                       >
-                        {categories?.length >= 1 && (
-                          <FormControl
-                            sx={{ m: 1, mx: 2, minWidth: 180 }}
-                            size="small"
-                          >
-                            <InputLabel id="demo-simple-select-label">
-                              Category
-                            </InputLabel>
-                            <Select
-                              labelId="demo-simple-select-label"
-                              id="demo-simple-select"
-                              value={
-                                note?.category === "Notes"
-                                  ? "Notes"
-                                  : note?.category
-                              }
-                              label="Category"
-                              onChange={(e) =>
-                                handleCategoryChangeForNot(
-                                  note?.id,
-                                  e.target.value
-                                )
-                              }
+                        {navOptionActive !== "Trash" ? (
+                          categories?.length >= 1 && (
+                            <FormControl
+                              sx={{ m: 1, mx: 2, minWidth: 180 }}
+                              size="small"
                             >
-                              {categories?.map((category) => (
-                                <MenuItem
-                                  key={category?.id}
-                                  value={category?.category_name}
-                                >
-                                  {category?.category_name}
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
+                              <InputLabel id="demo-simple-select-label">
+                                Category
+                              </InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={
+                                  note?.category === "Notes"
+                                    ? "Notes"
+                                    : note?.category
+                                }
+                                label="Category"
+                                onChange={(e) =>
+                                  handleCategoryChangeForNote(
+                                    note?.id,
+                                    e.target.value
+                                  )
+                                }
+                              >
+                                {categories?.map((category) => (
+                                  <MenuItem
+                                    key={category?.id}
+                                    value={category?.id}
+                                  >
+                                    {category?.category_name}
+                                  </MenuItem>
+                                ))}
+                              </Select>
+                            </FormControl>
+                          )
+                        ) : (
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(deleteNote(note?.id));
+                              closeCategoryMoreBtn();
+                            }}
+                            sx={{
+                              "&:hover":{
+                                background:"red",
+                                color:"white"
+                              }
+                            }}
+                          >
+                            <CloseIcon sx={{ mr: 2 }} />
+                            <ListItemText primary="Delete permanently" />
+                          </MenuItem>
                         )}
-                        <MenuItem
-                          onClick={() => {
-                            dispatch(addToFavourite(note?.id, !note?.favorite));
-                            closeCategoryMoreBtn();
-                          }}
-                        >
-                          <StarOutlineIcon sx={{ mr: 2 }} />
-                          <ListItemText
-                            primary={
-                              note?.favorite
-                                ? `Remove favorite`
-                                : `Mark as favorite`
-                            }
-                          />
-                        </MenuItem>
 
-                        <MenuItem
-                          onClick={() => {
-                            dispatch(addToTrash(note?.id, !note?.trash));
-                            closeCategoryMoreBtn();
-                          }}
-                        >
-                          <DeleteIcon sx={{ mr: 2 }} />
-                          <ListItemText primary="Move to trash" />
-                        </MenuItem>
+                        {navOptionActive !== "Trash" && (
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(
+                                addToFavourite(note?.id, !note?.favorite)
+                              );
+                              closeCategoryMoreBtn();
+                            }}
+                          >
+                            <StarOutlineIcon sx={{ mr: 2 }} />
+                            <ListItemText
+                              primary={
+                                note?.favorite
+                                  ? `Remove favorite`
+                                  : `Mark as favorite`
+                              }
+                            />
+                          </MenuItem>
+                        )}
+
+                        {navOptionActive !== "Trash" ? (
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(addToTrash(note?.id, !note?.trash));
+                              closeCategoryMoreBtn();
+                            }}
+                          >
+                            <DeleteIcon sx={{ mr: 2 }} />
+                            <ListItemText primary="Move to trash" />
+                          </MenuItem>
+                        ) : (
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(addToTrash(note?.id, !note?.trash));
+                              closeCategoryMoreBtn();
+                            }}
+                          >
+                            <DeleteIcon sx={{ mr: 2 }} />
+                            <ListItemText primary="Restore from trash" />
+                          </MenuItem>
+                        )}
 
                         <MenuItem
                           onClick={() => {
@@ -215,7 +270,9 @@ const NoteList = ({ showTrashBtn }) => {
                 disablePadding
                 sx={{
                   width: "100%",
-                  display: `${note?.trash ? "none" : "flex"}`,
+                  display: `${
+                    navOptionActive !== "Trash" && note?.trash ? "none" : "flex"
+                  }`,
                   //display: "flex",
                   alignItems: "center",
                   justifyContent: "space-between",
@@ -257,7 +314,9 @@ const NoteList = ({ showTrashBtn }) => {
                       }}
                     >
                       <BookIcon sx={{ fontSize: "14px", mr: 1 }} />{" "}
-                      {note?.category ? note?.category : "Notes"}
+                      {note?.category !== "Notes"
+                        ? getNoteCategory(note?.category)
+                        : "Notes"}
                     </Typography>
                   </Box>
                 </ListItemButton>

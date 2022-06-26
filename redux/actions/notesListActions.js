@@ -49,3 +49,9 @@ export const deleteNote = (id) => {
     id
   }
 }
+
+export const emptyTrash = () => {
+  return {
+    type:NOTE_ACTIONS.EMPTY_TRASH,
+  }
+}

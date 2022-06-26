@@ -39,19 +39,14 @@ import { addActiveNoteId } from "../redux/actions/activeNoteIdAction";
 
 const ITEM_HEIGHT = 48;
 
-const navOptions = [
-  { id: 1, name: "Scratchpad", icon: <BorderColorIcon /> },
-  { id: 2, name: "Notes", icon: <BookIcon /> },
-  { id: 3, name: "Favorite", icon: <StarBorderIcon /> },
-  { id: 4, name: "Trash", icon: <DeleteIcon /> },
-];
 
-const AppSidebar = () => {
+
+const AppSidebar = ({navOptions,navOptionActive, setNavOptionActive}) => {
   const notes = useSelector((state) => state.notes);
   const categories = useSelector((state) => state.categories);
   const dispatch = useDispatch();
 
-  const [navOptionActive, setNavOptionActive] = useState("Notes");
+  
   const [noteCategories, setNoteCategories] = useState(null);
   const [openCategories, setCategories] = useState(true);
   const [showMoreIcon, setShowMoreIcon] = useState(null);
@@ -121,7 +116,9 @@ const AppSidebar = () => {
         </List>
         <nav aria-label="main mailbox folders">
           <List>
-            {/* {navOptions?.map((option) => (
+
+
+            {navOptions?.map((option) => (
               <ListItem
                 disablePadding
                 key={option?.id}
@@ -142,8 +139,10 @@ const AppSidebar = () => {
                   />
                 </ListItemButton>
               </ListItem>
-            ))} */}
-            <ListItem disablePadding>
+            ))}
+
+
+            {/* <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon sx={{ color: "white" }}>
                   <BorderColorIcon />
@@ -174,7 +173,9 @@ const AppSidebar = () => {
                 </ListItemIcon>
                 <ListItemText sx={{ color: "white" }} primary="Trash" />
               </ListItemButton>
-            </ListItem>
+            </ListItem> */}
+
+
           </List>
         </nav>
         <Divider />
