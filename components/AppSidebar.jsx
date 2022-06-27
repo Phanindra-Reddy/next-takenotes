@@ -108,6 +108,7 @@ const AppSidebar = ({
                 )
               );
               dispatch(addActiveNoteId(notes && notes[0]?.id));
+              setNavOptionActive("Notes")
             }}
             sx={{
               "&:hover": {

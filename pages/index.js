@@ -37,7 +37,6 @@ export default function Home() {
     setNoteCategories(categories);
   }, [categories]);
 
-  console.log(currentCategory)
 
   return (
     <>
@@ -62,22 +61,34 @@ export default function Home() {
             currentCategory={currentCategory}
             setCurrentCategory={setCurrentCategory}
           />
-          <SplitPane
-            split="vertical"
-            minSize={150}
-            maxSize={500}
-            defaultSize={300}
-          >
-            {navOptionActive !== "Scratchpad" && (
+          {navOptionActive !== "Scratchpad" ? (
+            <SplitPane
+              split="vertical"
+              minSize={150}
+              maxSize={500}
+              defaultSize={300}
+            >
               <NoteList
                 navOptionActive={navOptionActive}
                 currentCategory={currentCategory}
               />
-            )}
-            <NoteEditor />
-          </SplitPane>
+              <NoteEditor navOptionActive={navOptionActive} />
+            </SplitPane>
+          ) : (
+            <NoteEditor navOptionActive={navOptionActive} />
+          )}
         </SplitPane>
       </>
     </>
   );
+}
+
+{
+  /* <SplitPane split="vertical" minSize={150} maxSize={500} defaultSize={300}>
+  <NoteList
+    navOptionActive={navOptionActive}
+    currentCategory={currentCategory}
+  />
+  <NoteEditor />
+</SplitPane>; */
 }

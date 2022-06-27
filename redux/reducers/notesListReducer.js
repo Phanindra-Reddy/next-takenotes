@@ -4,6 +4,13 @@ import { initialText } from "../../utils/initialNotes";
 
 const notesList = [
   {
+    id: "mpr-scratchpad",
+    scratchpad: true,
+    created: "2022-06-21T17:22:55+05:30",
+    lastUpdated: "2022-06-21T17:22:55+05:30",
+    text: "# Scratchpad\n\nThe easiest note to find.",
+  },
+  {
     id: "mpr-4070-222",
     category: "Notes",
     created: "2022-06-21T17:22:55+05:30",
@@ -56,7 +63,7 @@ const notesListReducer = (state = notesList, action) => {
       return state.filter((note) => note.id !== action.id);
 
     case NOTE_ACTIONS.EMPTY_TRASH:
-      return state.filter((note) => !note?.trash)
+      return state.filter((note) => !note?.trash);
 
     default:
       return state;

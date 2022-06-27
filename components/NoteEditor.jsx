@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import dayjs from "dayjs";
+import SettingsModal from "./SettingsModal";
 import { useDispatch, useSelector } from "react-redux";
 import { addToFavourite, addToTrash } from "../redux/actions/notesListActions";
 
@@ -34,7 +35,7 @@ const todayTime = `${dayjs().format("hh:mm A")} on  ${dayjs().format(
   "DD/MM/YYYY"
 )}`;
 
-const NoteEditor = () => {
+const NoteEditor = ({ navOptionActive }) => {
   const dispatch = useDispatch();
   const notes = useSelector((state) => state.notes);
   const activeNoteId = useSelector((state) => state.activeNoteId);
@@ -45,6 +46,10 @@ const NoteEditor = () => {
 
   //editor_peview_toggle
   const [showPreview, setShowPreview] = useState(false);
+
+  //settings_modal
+  const [openSettingsModal, setOpenSettingsModal] = useState(false)
+
 
   useEffect(() => {
     let active_note = notes?.find((note) => note?.id === activeNoteId);
@@ -81,9 +86,20 @@ const NoteEditor = () => {
     }
   };
 
+  const handleSettingsModal = () => {
+    setOpenSettingsModal(!openSettingsModal)
+  }
+
+
   return (
     <>
-      <Scrollbars>{showPreview ? <Preview /> : <DynamicEditor />}</Scrollbars>
+      <Scrollbars>
+        {showPreview ? (
+          <Preview navOptionActive={navOptionActive} />
+        ) : (
+          <DynamicEditor navOptionActive={navOptionActive} />
+        )}
+      </Scrollbars>
 
       <Box
         sx={{
@@ -114,40 +130,48 @@ const NoteEditor = () => {
             </ListItemButton>
           </ListItem>
 
-          <ListItem
-            disablePadding
-            onClick={() =>
-              dispatch(addToFavourite(activeNoteId, !currentNoteFavorite))
-            }
-          >
-            <ListItemButton
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+          {navOptionActive !== "Scratchpad" && (
+            <ListItem
+              disablePadding
+              onClick={() =>
+                dispatch(addToFavourite(activeNoteId, !currentNoteFavorite))
+              }
             >
-              {currentNoteFavorite ? <StarIcon /> : <StarBorderOutlinedIcon />}
-              {/* <StarBorderOutlinedIcon /> */}
-            </ListItemButton>
-          </ListItem>
+              <ListItemButton
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {currentNoteFavorite ? (
+                  <StarIcon />
+                ) : (
+                  <StarBorderOutlinedIcon />
+                )}
+                {/* <StarBorderOutlinedIcon /> */}
+              </ListItemButton>
+            </ListItem>
+          )}
 
-          <ListItem
-            disablePadding
-            onClick={() =>
-              dispatch(addToTrash(activeNoteId, !currentNoteTrash))
-            }
-          >
-            <ListItemButton
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+          {navOptionActive !== "Scratchpad" && (
+            <ListItem
+              disablePadding
+              onClick={() =>
+                dispatch(addToTrash(activeNoteId, !currentNoteTrash))
+              }
             >
-              <DeleteOutlineIcon />
-            </ListItemButton>
-          </ListItem>
+              <ListItemButton
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <DeleteOutlineIcon />
+              </ListItemButton>
+            </ListItem>
+          )}
 
           <ListItem disablePadding onClick={downloadNote}>
             <ListItemButton
@@ -191,7 +215,7 @@ const NoteEditor = () => {
             </ListItemButton>
           </ListItem> */}
 
-          <ListItem disablePadding>
+          <ListItem disablePadding onClick={handleSettingsModal}>
             <ListItemButton
               sx={{
                 display: "flex",
@@ -204,6 +228,10 @@ const NoteEditor = () => {
           </ListItem>
         </List>
       </Box>
+      <SettingsModal
+        openSettingsModal={openSettingsModal}
+        handleSettingsModal={handleSettingsModal}
+      />
     </>
   );
 };

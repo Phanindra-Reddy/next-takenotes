@@ -101,13 +101,13 @@ const NoteList = ({ navOptionActive, currentCategory }) => {
           style={{ padding: "8px", display: "flex" }}
           onKeyUp={handleNoteSearch}
         >
-          <input
+          {/* <input
             type="text"
             placeholder="Searh for notes"
             value={notesSearchText}
             onChange={(e) => setNotesSearchText(e.target.value)}
             className="searchInput"
-          />
+          /> */}
 
           {navOptionActive === "Trash" && (
             <Button
@@ -116,7 +116,7 @@ const NoteList = ({ navOptionActive, currentCategory }) => {
               sx={{ ml: 1 }}
               onClick={() => dispatch(emptyTrash())}
             >
-              Empty
+              Empty Trash
             </Button>
           )}
         </form>
@@ -126,7 +126,7 @@ const NoteList = ({ navOptionActive, currentCategory }) => {
 
       <List sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}>
         {notesList &&
-          notesList?.map((note) => (
+          notesList?.filter((note)=>!note?.scratchpad)?.map((note) => (
             <>
               <ListItem
                 key={note?.id}
