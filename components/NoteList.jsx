@@ -124,7 +124,7 @@ const NoteList = ({ navOptionActive, currentCategory }) => {
 
       <Divider />
 
-      <List sx={{ width: "100%", maxWidth: 500, bgcolor: "background.paper" }}>
+      <List sx={{ width: "100%", maxWidth: 500 }}>
         {notesList &&
           notesList?.filter((note)=>!note?.scratchpad)?.map((note) => (
             <>
